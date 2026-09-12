@@ -1,0 +1,6 @@
+{
+  "name": "CalcX",
+  "description": "Calculate. Convert. Understand. An all-in-one calculator application.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
