@@ -23,12 +23,32 @@ data class GlobalQuote(
     @kotlinx.serialization.SerialName("10. change percent") val changePercent: String
 )
 
+@Serializable
+data class CurrencyExchangeRateResponse(
+    @kotlinx.serialization.SerialName("Realtime Currency Exchange Rate") val exchangeRate: CurrencyExchangeRate? = null
+)
+
+@Serializable
+data class CurrencyExchangeRate(
+    @kotlinx.serialization.SerialName("1. From_Currency Code") val fromCode: String,
+    @kotlinx.serialization.SerialName("3. To_Currency Code") val toCode: String,
+    @kotlinx.serialization.SerialName("5. Exchange Rate") val exchangeRate: String,
+    @kotlinx.serialization.SerialName("6. Last Refreshed") val lastRefreshed: String
+)
+
 interface AlphaVantageApiService {
     @GET("query?function=GLOBAL_QUOTE")
     suspend fun getQuote(
         @Query("symbol") symbol: String,
         @Query("apikey") apiKey: String
     ): GlobalQuoteResponse
+
+    @GET("query?function=CURRENCY_EXCHANGE_RATE")
+    suspend fun getExchangeRate(
+        @Query("from_currency") fromCurrency: String,
+        @Query("to_currency") toCurrency: String,
+        @Query("apikey") apiKey: String
+    ): CurrencyExchangeRateResponse
 }
 
 object AlphaVantageClient {

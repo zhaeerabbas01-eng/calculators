@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -31,12 +32,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.SyncAlt
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import com.example.ui.screens.home.HomeScreen
 import com.example.ui.screens.aimath.AiMathScreen
 import com.example.ui.screens.history.HistoryScreen
 import com.example.ui.screens.settings.SettingsScreen
 import com.example.ui.screens.tools.ToolsScreen
 import com.example.ui.screens.market.MarketScreen
+import com.example.ui.screens.tools.UnitConverterScreen
+import com.example.ui.screens.tools.CurrencyConverterScreen
+import com.example.ui.screens.tools.FinanceCalculatorScreen
+import com.example.ui.screens.tools.GeometryCalculatorScreen
+import com.example.ui.screens.tools.StatisticsCalculatorScreen
+import com.example.ui.screens.tools.ProgrammerCalculatorScreen
+import com.example.ui.screens.tools.DateTimeCalculatorScreen
+import com.example.ui.screens.tools.DailyTasksScreen
+import com.example.ui.screens.tools.DailyTasksViewModel
 
 import com.example.ui.screens.tools.ToolFeatureScreen
 import androidx.navigation.NavType
@@ -49,7 +68,15 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object History : Screen("history", "History", Icons.Default.History)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
     object AiMath : Screen("aimath", "AI Math", Icons.Default.AutoAwesome)
-    object Market : Screen("market", "Market", Icons.Default.ShowChart)
+    object Market : Screen("market", "Market", Icons.AutoMirrored.Filled.ShowChart)
+    object UnitConverter : Screen("unit_converter", "Unit Converter", Icons.Default.SyncAlt)
+    object CurrencyConverter : Screen("currency_converter", "Currency", Icons.Default.AttachMoney)
+    object FinanceCalculators : Screen("finance_calculators", "Finance", Icons.Default.AccountBalance)
+    object GeometryCalculator : Screen("geometry", "Geometry", Icons.Default.Category)
+    object StatisticsCalculator : Screen("statistics", "Statistics", Icons.Default.BarChart)
+    object ProgrammerCalculator : Screen("programmer", "Programmer", Icons.Default.Code)
+    object DateTimeCalculator : Screen("datetime", "Date & Time", Icons.Default.DateRange)
+    object DailyTasks : Screen("daily_tasks", "Daily Tracker", Icons.Default.CheckCircle)
     object ToolFeature : Screen("tool/{toolType}", "Tool", Icons.Default.Widgets) {
         fun createRoute(toolType: String) = "tool/$toolType"
     }
@@ -126,6 +153,14 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
                 ToolsScreen(
                     onNavigateToAiMath = { navController.navigate(Screen.AiMath.route) },
                     onNavigateToMarket = { navController.navigate(Screen.Market.route) },
+                    onNavigateToUnitConverter = { navController.navigate(Screen.UnitConverter.route) },
+                    onNavigateToCurrencyConverter = { navController.navigate(Screen.CurrencyConverter.route) },
+                    onNavigateToFinance = { navController.navigate(Screen.FinanceCalculators.route) },
+                    onNavigateToGeometry = { navController.navigate(Screen.GeometryCalculator.route) },
+                    onNavigateToStatistics = { navController.navigate(Screen.StatisticsCalculator.route) },
+                    onNavigateToProgrammer = { navController.navigate(Screen.ProgrammerCalculator.route) },
+                    onNavigateToDateTime = { navController.navigate(Screen.DateTimeCalculator.route) },
+                    onNavigateToDailyTasks = { navController.navigate(Screen.DailyTasks.route) },
                     onNavigateToTool = { toolType -> navController.navigate(Screen.ToolFeature.createRoute(toolType)) }
                 )
             }
@@ -140,6 +175,33 @@ fun AppNavigation(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
             }
             composable(Screen.Market.route) {
                 MarketScreen()
+            }
+            composable(Screen.UnitConverter.route) {
+                UnitConverterScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.CurrencyConverter.route) {
+                CurrencyConverterScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.FinanceCalculators.route) {
+                FinanceCalculatorScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.GeometryCalculator.route) {
+                GeometryCalculatorScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.StatisticsCalculator.route) {
+                StatisticsCalculatorScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.ProgrammerCalculator.route) {
+                ProgrammerCalculatorScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.DateTimeCalculator.route) {
+                DateTimeCalculatorScreen(onBack = { navController.popBackStack() })
+            }
+            composable(Screen.DailyTasks.route) {
+                val dailyTasksViewModel: DailyTasksViewModel = viewModel(
+                    factory = ViewModelProvider.AndroidViewModelFactory.getInstance(app)
+                )
+                DailyTasksScreen(onBack = { navController.popBackStack() }, viewModel = dailyTasksViewModel)
             }
             composable(
                 route = Screen.ToolFeature.route,

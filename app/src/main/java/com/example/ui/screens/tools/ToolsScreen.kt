@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,19 +22,28 @@ import androidx.compose.ui.unit.dp
 fun ToolsScreen(
     onNavigateToAiMath: () -> Unit,
     onNavigateToMarket: () -> Unit,
+    onNavigateToUnitConverter: () -> Unit,
+    onNavigateToCurrencyConverter: () -> Unit,
+    onNavigateToFinance: () -> Unit,
+    onNavigateToGeometry: () -> Unit,
+    onNavigateToStatistics: () -> Unit,
+    onNavigateToProgrammer: () -> Unit,
+    onNavigateToDateTime: () -> Unit,
+    onNavigateToDailyTasks: () -> Unit,
     onNavigateToTool: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val tools = listOf(
         ToolItem("AI Math Assistant", Icons.Default.AutoAwesome, onNavigateToAiMath),
-        ToolItem("Live Market Prices", Icons.Default.ShowChart, { onNavigateToMarket() }),
-        ToolItem("Unit Converter", Icons.Default.SyncAlt, { onNavigateToTool("unit") }),
-        ToolItem("Currency Converter", Icons.Default.AttachMoney, { onNavigateToTool("currency") }),
-        ToolItem("Geometry", Icons.Default.Category, { onNavigateToTool("geometry") }),
-        ToolItem("Statistics", Icons.Default.BarChart, { onNavigateToTool("statistics") }),
-        ToolItem("Financial", Icons.Default.AccountBalance, { onNavigateToTool("financial") }),
-        ToolItem("Programmer", Icons.Default.Code, { onNavigateToTool("programmer") }),
-        ToolItem("Date & Time", Icons.Default.DateRange, { onNavigateToTool("datetime") })
+        ToolItem("Live Market Prices", Icons.AutoMirrored.Filled.ShowChart, { onNavigateToMarket() }),
+        ToolItem("Unit Converter", Icons.Default.SyncAlt, { onNavigateToUnitConverter() }),
+        ToolItem("Currency Converter", Icons.Default.AttachMoney, { onNavigateToCurrencyConverter() }),
+        ToolItem("Finance (EMI, Interest)", Icons.Default.AccountBalance, { onNavigateToFinance() }),
+        ToolItem("Geometry", Icons.Default.Category, { onNavigateToGeometry() }),
+        ToolItem("Statistics", Icons.Default.BarChart, { onNavigateToStatistics() }),
+        ToolItem("Programmer", Icons.Default.Code, { onNavigateToProgrammer() }),
+        ToolItem("Date & Time", Icons.Default.DateRange, { onNavigateToDateTime() }),
+        ToolItem("Daily Life Tracking", Icons.Default.CheckCircle, { onNavigateToDailyTasks() })
     )
 
     Scaffold(

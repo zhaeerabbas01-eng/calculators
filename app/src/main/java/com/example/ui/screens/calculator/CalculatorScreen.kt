@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.engine.ExpressionEvaluator
 
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 
@@ -92,18 +94,60 @@ fun CalculatorScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+        var isScientific by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isScientific) {
+                val modeStr = when(angleMode) {
+                    ExpressionEvaluator.AngleMode.DEGREE -> "DEG"
+                    ExpressionEvaluator.AngleMode.RADIAN -> "RAD"
+                    ExpressionEvaluator.AngleMode.GRADIAN -> "GRAD"
+                }
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier.clickable { viewModel.onAction(CalculatorAction.ToggleAngleMode) }
+                ) {
+                    Text(
+                        text = modeStr,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            FilledTonalButton(
+                onClick = { isScientific = !isScientific },
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            ) {
+                Icon(
+                    imageVector = if (isScientific) Icons.Default.Calculate else Icons.Default.Calculate, // Or some suitable icon
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(if (isScientific) "Basic Mode" else "Scientific Mode", fontWeight = FontWeight.Bold)
+            }
+        }
 
         // Keypad section
-        val pagerState = rememberPagerState(pageCount = { 2 })
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1.5f)
-        ) { page ->
-            when (page) {
-                0 -> BasicKeypad(viewModel = viewModel)
-                1 -> ScientificKeypad(viewModel = viewModel, angleMode = angleMode)
+        Box(modifier = Modifier.weight(1.5f)) {
+            if (isScientific) {
+                ScientificKeypad(viewModel = viewModel)
+            } else {
+                BasicKeypad(viewModel = viewModel)
             }
         }
     }
@@ -122,7 +166,6 @@ fun BasicKeypad(viewModel: CalculatorViewModel) {
             listOf("4", "5", "6", "-"),
             listOf("1", "2", "3", "+")
         )
-
         rows.forEach { row ->
             Row(
                 modifier = Modifier
@@ -164,7 +207,7 @@ fun BasicKeypad(viewModel: CalculatorViewModel) {
                 onClick = { viewModel.onAction(CalculatorAction.Number(0)) }
             )
             CalculatorButton(
-                symbol = ",",
+                symbol = ".",
                 modifier = Modifier.weight(1f).fillMaxHeight(),
                 onClick = { viewModel.onAction(CalculatorAction.Decimal) }
             )
@@ -178,33 +221,27 @@ fun BasicKeypad(viewModel: CalculatorViewModel) {
 }
 
 @Composable
-fun ScientificKeypad(viewModel: CalculatorViewModel, angleMode: ExpressionEvaluator.AngleMode) {
+fun ScientificKeypad(viewModel: CalculatorViewModel) {
     val buttonSpacing = 8.dp
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(buttonSpacing)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val modeStr = when(angleMode) {
-                ExpressionEvaluator.AngleMode.DEGREE -> "DEG"
-                ExpressionEvaluator.AngleMode.RADIAN -> "RAD"
-                ExpressionEvaluator.AngleMode.GRADIAN -> "GRAD"
-            }
-            MemoryButton(modeStr) { viewModel.onAction(CalculatorAction.ToggleAngleMode) }
-        }
-
         val rows = listOf(
-            listOf("sin", "cos", "tan", "mod"),
-            listOf("asin", "acos", "atan", "abs"),
-            listOf("sinh", "cosh", "tanh", "π"),
-            listOf("log", "ln", "e", "x²"),
-            listOf("√", "∛", "!", "^")
+            listOf("(", ")", "sin", "cos", "tan"),
+            listOf("mod", "asin", "acos", "atan", "abs"),
+            listOf("sinh", "cosh", "tanh", "π", "e"),
+            listOf("log", "ln", "x²", "√", "∛"),
+            listOf("!", "^", "÷", "×", "-")
         )
+        val basicRow1 = listOf("7", "8", "9", "+")
+        val basicRow2 = listOf("4", "5", "6", ".")
+        val basicRow3 = listOf("1", "2", "3", "=")
+        val basicRow4 = listOf("AC", "0", "⌫", "")
+        
+        val allRows = rows + listOf(basicRow1, basicRow2, basicRow3, basicRow4)
 
-        rows.forEach { row ->
+        allRows.forEach { row ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -212,22 +249,37 @@ fun ScientificKeypad(viewModel: CalculatorViewModel, angleMode: ExpressionEvalua
                 horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
             ) {
                 row.forEach { symbol ->
-                    CalculatorButton(
-                        symbol = symbol,
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            when (symbol) {
-                                "x²" -> viewModel.onAction(CalculatorAction.Operator("²"))
-                                "^" -> viewModel.onAction(CalculatorAction.Operator("^"))
-                                "!" -> viewModel.onAction(CalculatorAction.Operator("!"))
-                                "π" -> viewModel.onAction(CalculatorAction.Function("π"))
-                                "e" -> viewModel.onAction(CalculatorAction.Function("e"))
-                                "mod" -> viewModel.onAction(CalculatorAction.Operator("mod"))
-                                "abs" -> viewModel.onAction(CalculatorAction.Function("abs"))
-                                else -> viewModel.onAction(CalculatorAction.Function(symbol))
+                    if (symbol.isEmpty()) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    } else {
+                        CalculatorButton(
+                            symbol = symbol,
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                when (symbol) {
+                                    "AC" -> viewModel.onAction(CalculatorAction.Clear)
+                                    "⌫" -> viewModel.onAction(CalculatorAction.Delete)
+                                    "=" -> viewModel.onAction(CalculatorAction.Calculate)
+                                    "." -> viewModel.onAction(CalculatorAction.Decimal)
+                                    "÷" -> viewModel.onAction(CalculatorAction.Operator("÷"))
+                                    "×" -> viewModel.onAction(CalculatorAction.Operator("×"))
+                                    "-" -> viewModel.onAction(CalculatorAction.Operator("-"))
+                                    "+" -> viewModel.onAction(CalculatorAction.Operator("+"))
+                                    "(" -> viewModel.onAction(CalculatorAction.Function("("))
+                                    ")" -> viewModel.onAction(CalculatorAction.Function(")"))
+                                    "x²" -> viewModel.onAction(CalculatorAction.Operator("²"))
+                                    "^" -> viewModel.onAction(CalculatorAction.Operator("^"))
+                                    "!" -> viewModel.onAction(CalculatorAction.Operator("!"))
+                                    "π" -> viewModel.onAction(CalculatorAction.Function("π"))
+                                    "e" -> viewModel.onAction(CalculatorAction.Function("e"))
+                                    "mod" -> viewModel.onAction(CalculatorAction.Operator("mod"))
+                                    "abs" -> viewModel.onAction(CalculatorAction.Function("abs"))
+                                    "0","1","2","3","4","5","6","7","8","9" -> viewModel.onAction(CalculatorAction.Number(symbol.toInt()))
+                                    else -> viewModel.onAction(CalculatorAction.Function(symbol))
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
